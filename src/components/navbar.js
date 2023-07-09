@@ -1,5 +1,21 @@
+import { useEffect, useState } from "react"
+
 export function Search({ query, setQuery }) {
 
+
+  //one of the way to decrease the number of api calls by adding a settimeout to the input 
+  // const [q,sq]=useState(query)
+  // useEffect(()=>{
+  //   const timer=setTimeout(
+  //     handle,500)
+
+  // return ()=> clearTimeout(timer)
+  // })
+
+  // const handle=()=>{
+  //   setQuery(q)
+  // }
+  
     return <input
       className="search"
       type="text"

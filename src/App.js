@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { MovieDetails } from "./components/movieDetails";
 import Loader from "./components/loader";
-import { Search,SearchResults,NavBar,Logo } from "./components/navbar";
+import { Search, SearchResults, NavBar, Logo } from "./components/navbar";
 import ErrorMessage from "./components/error";
 import WatchedMovieList from "./components/watchedMovieList";
 import WatchedSummary from "./components/watchedSummary";
@@ -120,34 +120,37 @@ export default function App() {
     setSelectedId(null)
   }
 
-  const handleAddWatched=movie=>{
-    setWatched(watched=>[...watched,movie])
+  const handleAddWatched = movie => {
+    setWatched(watched => [...watched, movie])
   }
 
-  const handleRemoveWatched=(id)=>{
-    setWatched(watched=>watched.filter(movie=>movie.imdbID!==id))
+  const handleRemoveWatched = (id) => {
+    setWatched(watched => watched.filter(movie => movie.imdbID !== id))
   }
 
 
   //search functionality
   useEffect(
     () => {
-
+      const controller = new AbortController()
       async function fetchMovie() {
 
         try {
           setIsLoading(true)
           setError("")
-          const res = await fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=${query}`)
+          const res = await fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
+            { signal: controller.signal }
+          )
 
           if (!res.ok) throw new Error("something went wrong while fetching movies!!")
           const data = await res.json()
           if (data.Response === 'False') throw new Error(data.Error)
           setMovies(data.Search)
-          //console.log(data.Search)
           setIsLoading(false)
+          setError("")
 
         } catch (err) {
+          if(err.name!=="AbortError")
           setError(err.message)
         }
         finally {
@@ -160,11 +163,14 @@ export default function App() {
         setError("")
         return
       }
+      handleCloseMovie()
       fetchMovie()
 
+      return () => {
+        controller.abort()
+      }
+
     }, [query])
-
-
 
   return (
     <>
@@ -186,10 +192,10 @@ export default function App() {
         <Box>
           {
             selectedId ? <MovieDetails
-            onAddWatched={handleAddWatched}
-             onCloseMovie={handleCloseMovie}
-             watched={watched} 
-            selectedId={selectedId} /> :
+              onAddWatched={handleAddWatched}
+              onCloseMovie={handleCloseMovie}
+              watched={watched}
+              selectedId={selectedId} /> :
               <>
                 <WatchedSummary watched={watched} />
                 <WatchedMovieList watched={watched} onRemoveWatched={handleRemoveWatched} />

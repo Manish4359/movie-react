@@ -29,6 +29,11 @@ export function MovieDetails({onAddWatched, selectedId, onCloseMovie,watched }) 
       if (!selectedId) return
       fetchMovieDetails()
     }, [selectedId])
+
+    
+
+  
+
   
     const {
       Title:title,
@@ -42,6 +47,17 @@ export function MovieDetails({onAddWatched, selectedId, onCloseMovie,watched }) 
       Director:director,
       Genre:genre
     }=movie
+
+    useEffect(()=>{
+
+      
+     title && (document.title=`Movie | ${title}`)
+
+     return ()=>document.title="usePopcorn"
+    },[title])
+
+
+
   
     const handleAdd=()=>{
       if(isWatched)return
